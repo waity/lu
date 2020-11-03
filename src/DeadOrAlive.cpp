@@ -9,12 +9,14 @@ int DeadOrAlive::move(int request, int request_index) {
 
   std::vector<int>::iterator seq_next_request_it = std::find(request_sequence.begin() + request_index + 1, request_sequence.end(), request);
 
-  // If we do not request this item again. return lookup cost.
+  // If we do not request this item again. return access cost.
   if ( seq_next_request_it == request_sequence.end() ) {
     return cost;
   }
 
   double doa_weight = 0;
+  double min_doa = 0;
+  int discrete_pos = list_request_index;
 
   for ( int i = list_request_index - 1; i >= 0; i-- ) {
     std::vector<int>::iterator dead_or_alive = std::find(request_sequence.begin() + request_index + 1, seq_next_request_it, list[i]);
@@ -23,10 +25,18 @@ int DeadOrAlive::move(int request, int request_index) {
     }
     else {
       doa_weight -= dead_weight;
+      if ( continuous && doa_weight < min_doa ) {
+        min_doa = doa_weight;
+        discrete_pos = i;
+      }
     }
   }
 
-  if ( doa_weight <= 0 ) {
+  if ( continuous && min_doa < 0 ) {
+    list.erase(list_request_it);
+    list.insert(list.begin() + discrete_pos, request);
+  }
+  else if ( doa_weight <= 0 ) {
     list.erase(list_request_it);
     list.insert(list.begin(), request);
   }

@@ -1,1 +1,1 @@
-./bin/run -r 10 -l 4 -n 15 -D -M
+./bin/run -r 10 -l 4 -n 15 -D -d -M

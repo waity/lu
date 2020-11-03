@@ -16,7 +16,9 @@ engine_type engine;
  * -r request length
  * -l list length
  * -n number of trials
- * -A algorithms
+ * -M mtf
+ * -D dead or alive (discrete)
+ * -d dead or alive (continuous)
  * -f file 
  * -s Seed
  */
@@ -44,7 +46,13 @@ int main(int argc, char* argv[]) {
       int dead_weight = 1;
       int alive_weight = 1;
 
-      algorithms.push_back(std::make_unique<DeadOrAlive>(dead_weight, alive_weight));
+      algorithms.push_back(std::make_unique<DeadOrAlive>(dead_weight, alive_weight, false));
+    }
+    else if ( c.compare("-d") == 0 ) {
+      int dead_weight = 1;
+      int alive_weight = 1;
+
+      algorithms.push_back(std::make_unique<DeadOrAlive>(dead_weight, alive_weight, true));
     }
     else if ( c.compare("-f") == 0 ) {
       file_name = argv[++i];
