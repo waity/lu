@@ -1,10 +1,12 @@
 #ifndef ALGORITHM
 #include <vector>
 #include <iostream>
+#include <string>
 
 #define ALGORITHM
 class Algorithm {
   public:
+    virtual std::string name() = 0;
     void setup(std::vector<int> request_sequence, int list_length) {
       Algorithm::request_length = request_sequence.size();
       Algorithm::request_sequence = request_sequence;
@@ -24,12 +26,12 @@ class Algorithm {
     int list_length;
     std::vector<int> list;
 
-    void print_list() {
+    void print_list_ints(std::vector<int> l) {
       //vector<int> v;
       std::cout << "[";
-      for (int i=0; i < list_length; i++){
-        std::cout << list[i];
-        if (i != list_length - 1) {
+      for (uint i=0; i < l.size(); i++){
+        std::cout << l[i];
+        if (i != l.size() - 1) {
           std::cout << ", ";
         }
       }

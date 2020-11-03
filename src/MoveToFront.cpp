@@ -1,10 +1,10 @@
 #include "MoveToFront.h"
 #include <algorithm>
 
-int MoveToFront::move(int request) {
-  std::vector<int>::iterator i = std::find(list.begin(), list.end(), request);
-  int cost = i - list.begin() + 1;
-  list.erase(i);
+int MoveToFront::move(int request, int request_index) {
+  std::vector<int>::iterator it = std::find(list.begin(), list.end(), request);
+  int cost = it - list.begin() + 1;
+  list.erase(it);
   list.insert(list.begin(), request);
   return cost;
 }

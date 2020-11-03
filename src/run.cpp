@@ -5,6 +5,7 @@
 #include <memory>
 #include "Algorithm.h"
 #include "MoveToFront.h"
+#include "DeadOrAlive.h"
 
 
 typedef std::mt19937 engine_type;
@@ -22,7 +23,6 @@ engine_type engine;
 int main(int argc, char* argv[]) {
   int request_length, list_length, number_of_trials, seed;
   std::string file_name;
-  // std::vector<Algorithm*> algorithms;
   std::vector<std::unique_ptr<Algorithm>> algorithms;
   bool valid = true;
 
@@ -37,8 +37,14 @@ int main(int argc, char* argv[]) {
     else if ( c.compare("-n") == 0 ) {
       number_of_trials = std::stoi(argv[++i]);
     }
-    else if ( c.compare("-A") == 0 ) {
+    else if ( c.compare("-M") == 0 ) {
       algorithms.push_back(std::make_unique<MoveToFront>());
+    }
+    else if ( c.compare("-D") == 0 ) {
+      int dead_weight = 1;
+      int alive_weight = 1;
+
+      algorithms.push_back(std::make_unique<DeadOrAlive>(dead_weight, alive_weight));
     }
     else if ( c.compare("-f") == 0 ) {
       file_name = argv[++i];
@@ -77,7 +83,7 @@ int main(int argc, char* argv[]) {
 
     for ( uint i = 0; i < algorithms.size(); i++ ) {
       algorithms.at(i)->setup(request_sequence, list_length);
-      std::cout << algorithms.at(i)->run() << "\n";
+      std::cout << algorithms.at(i)->name() << ": " << algorithms.at(i)->run() << "\n";
     }
   }
 }
