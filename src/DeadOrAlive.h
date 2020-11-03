@@ -4,7 +4,12 @@
   class DeadOrAlive : public MTFAlgorithm {
     public:
       std::string name() {
-        return "dead or alive";
+        if ( continuous ) {
+          return "continuous doa";
+        }
+        else {
+          return "discrete doa";
+        }
       };
       DeadOrAlive(double dead_weight, double alive_weight, bool continuous) {
         DeadOrAlive::dead_weight = dead_weight;

@@ -3,6 +3,8 @@
 #include <functional>
 #include <random>
 #include <memory>
+#include <iostream>
+#include <fstream>
 #include "Algorithm.h"
 #include "MoveToFront.h"
 #include "DeadOrAlive.h"
@@ -83,15 +85,38 @@ int main(int argc, char* argv[]) {
   std::uniform_int_distribution<engine_type::result_type> udist(0, list_length - 1);
   auto rng = std::bind(udist, engine);
 
+  // this should all be cleaned up, but for now:
+  std::ofstream file;
+  file.open("results.csv");
+  file << "sequence,";
+  for ( uint i = 0; i < algorithms.size(); i++ ) {
+    file << algorithms.at(i)->name();
+    if ( i != algorithms.size() - 1 ) {
+      file << ",";
+    }
+  }
+  file << "\n";
+
   for ( int t = 0; t < number_of_trials; t++ ) {
     std::vector<int> request_sequence;
     for ( int i = 0; i < request_length; i++ ) {
-      request_sequence.push_back(rng());
+      int request = rng();
+      request_sequence.push_back(request);
+      file << request;
     }
+
+    file << ",";
 
     for ( uint i = 0; i < algorithms.size(); i++ ) {
       algorithms.at(i)->setup(request_sequence, list_length);
-      std::cout << algorithms.at(i)->name() << ": " << algorithms.at(i)->run() << "\n";
+      file << algorithms.at(i)->run();
+      if ( i != algorithms.size() - 1 ) {
+        file << ",";
+      }
     }
+
+  file << "\n";
   }
+
+  file.close();
 }
