@@ -2,11 +2,15 @@
 #include <algorithm>
 
 int DeadOrAlive::move(int request, int request_index) {
+
+  // find position of request in list
   std::vector<int>::iterator list_request_it = std::find(list.begin(), list.end(), request);
   int list_request_index = list_request_it - list.begin();
 
+  // cost is access cost
   int cost = list_request_index + 1;
 
+  // next request lies between request_index and end of request_sequence
   std::vector<int>::iterator seq_next_request_it = std::find(request_sequence.begin() + request_index + 1, request_sequence.end(), request);
 
   // If we do not request this item again. return access cost.
@@ -18,6 +22,7 @@ int DeadOrAlive::move(int request, int request_index) {
   double min_doa = 0;
   int discrete_pos = list_request_index;
 
+  // for each element ahead of i in list, check if it is dead or alive.
   for ( int i = list_request_index - 1; i >= 0; i-- ) {
     std::vector<int>::iterator dead_or_alive = std::find(request_sequence.begin() + request_index + 1, seq_next_request_it, list[i]);
     if (*dead_or_alive == list[i]) {
@@ -25,6 +30,7 @@ int DeadOrAlive::move(int request, int request_index) {
     }
     else {
       doa_weight -= dead_weight;
+      // if continuous, check most dead update position
       if ( continuous && doa_weight < min_doa ) {
         min_doa = doa_weight;
         discrete_pos = i;
