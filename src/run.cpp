@@ -5,6 +5,7 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include "Algorithm.h"
 #include "MoveToFront.h"
 #include "DeadOrAlive.h"
@@ -12,6 +13,49 @@
 
 typedef std::mt19937 engine_type;
 engine_type engine;
+
+auto setup_rng(bool seed_given, int seed, int max_value) {
+  if ( !seed_given ) {
+    srand((unsigned int)time(NULL));
+    seed = rand();
+  }
+
+  engine_type::result_type const seedval = seed;
+  engine.seed(seedval);
+
+  std::uniform_int_distribution<engine_type::result_type> udist(0, max_value);
+  auto rng = std::bind(udist, engine);
+  return rng;
+}
+
+void write_csv_line(std::ofstream &file, std::vector<std::string> &elements) {
+  for ( uint i = 0; i < elements.size(); i++ ) {
+    file << elements.at(i);
+    if ( i != elements.size() - 1 ) {
+      file << ",";
+    }
+  }
+  file << "\n";
+}
+
+void run_request_sequence(std::vector<std::unique_ptr<Algorithm>> &algorithms, std::vector<int> &request_sequence, int list_length, std::ofstream &file) {
+  std::vector<std::string> line;
+
+  std::stringstream ss;
+  for ( uint i = 0; i < request_sequence.size(); i++ ) {
+    ss << request_sequence.at(i);
+  }
+
+  line.push_back(ss.str());
+  
+  for ( uint i = 0; i < algorithms.size(); i++ ) {
+    algorithms.at(i)->setup(request_sequence, list_length);
+    int result = algorithms.at(i)->run();
+    line.push_back(std::to_string(result));
+  }
+
+  write_csv_line(file, line);
+}
 
 /*
  * Arguments:
@@ -29,6 +73,7 @@ int main(int argc, char* argv[]) {
   std::string file_name;
   std::vector<std::unique_ptr<Algorithm>> algorithms;
   bool valid = true;
+  bool seed_given = false;
 
   for ( int i = 1; i < argc; i++ ) {
     std::string c = argv[i];
@@ -61,6 +106,7 @@ int main(int argc, char* argv[]) {
     }
     else if ( c.compare("-s") == 0 ) {
       seed = std::stoi(argv[++i]);
+      seed_given = true;
     }
   }
 
@@ -77,45 +123,29 @@ int main(int argc, char* argv[]) {
     exit(-1);
   }
 
-  if ( seed ) {
-    engine_type::result_type const seedval = seed;
-    engine.seed(seedval);
-  }
+  auto rng = setup_rng(seed_given, seed, list_length - 1);
 
-  std::uniform_int_distribution<engine_type::result_type> udist(0, list_length - 1);
-  auto rng = std::bind(udist, engine);
-
-  // this should all be cleaned up, but for now:
   std::ofstream file;
   file.open("results.csv");
-  file << "sequence,";
+
+  std::vector<std::string> header;
+  header.push_back("sequence");
   for ( uint i = 0; i < algorithms.size(); i++ ) {
-    file << algorithms.at(i)->name();
-    if ( i != algorithms.size() - 1 ) {
-      file << ",";
-    }
+    header.push_back(algorithms.at(i)->name());
   }
-  file << "\n";
+
+  write_csv_line(file, header);
 
   for ( int t = 0; t < number_of_trials; t++ ) {
+    // create request sequence
     std::vector<int> request_sequence;
     for ( int i = 0; i < request_length; i++ ) {
       int request = rng();
       request_sequence.push_back(request);
-      file << request;
     }
 
-    file << ",";
-
-    for ( uint i = 0; i < algorithms.size(); i++ ) {
-      algorithms.at(i)->setup(request_sequence, list_length);
-      file << algorithms.at(i)->run();
-      if ( i != algorithms.size() - 1 ) {
-        file << ",";
-      }
-    }
-
-  file << "\n";
+    // run request sequence on algorithms.
+    run_request_sequence(algorithms, request_sequence, list_length, file);
   }
 
   file.close();

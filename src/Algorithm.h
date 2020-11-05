@@ -27,7 +27,6 @@ class Algorithm {
     std::vector<int> list;
 
     void print_list_ints(std::vector<int> l) {
-      //vector<int> v;
       std::cout << "[";
       for (uint i=0; i < l.size(); i++){
         std::cout << l[i];
