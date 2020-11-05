@@ -6,6 +6,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <chrono>
+#include <ctime>   
 #include "Algorithm.h"
 #include "MoveToFront.h"
 #include "DeadOrAlive.h"
@@ -75,6 +77,7 @@ int main(int argc, char* argv[]) {
   bool valid = true;
   bool seed_given = false;
 
+
   for ( int i = 1; i < argc; i++ ) {
     std::string c = argv[i];
     if ( c.compare("-r") == 0 ) {
@@ -122,6 +125,12 @@ int main(int argc, char* argv[]) {
     std::cout << "Invalid command line arguments\n";
     exit(-1);
   }
+  
+
+  auto start = std::chrono::system_clock::now();
+  std::time_t start_time = std::chrono::system_clock::to_time_t(start);
+  std::cout << "starting, " << algorithms.size() << " algorithms running\n";
+  std::cout << "start time: " << std::ctime(&start_time);
 
   auto rng = setup_rng(seed_given, seed, list_length - 1);
 
@@ -149,4 +158,10 @@ int main(int argc, char* argv[]) {
   }
 
   file.close();
+
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end-start;
+  std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+  std::cout << "finished at " << std::ctime(&end_time);
+  std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
 }

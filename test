@@ -1,1 +1,1 @@
-./bin/run -r 10 -l 4 -n 15 -D -d -M
+./bin/run -r 10 -l 4 -n 100000 -D -d -M
