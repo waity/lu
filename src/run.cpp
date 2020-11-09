@@ -7,10 +7,13 @@
 #include <fstream>
 #include <sstream>
 #include <chrono>
-#include <ctime>   
+#include <ctime>
+#include <thread>
 #include "Algorithm.h"
 #include "MoveToFront.h"
 #include "DeadOrAlive.h"
+#include "Opt.h"
+#include "OptFree.h"
 
 
 typedef std::mt19937 engine_type;
@@ -92,6 +95,12 @@ int main(int argc, char* argv[]) {
     else if ( c.compare("-M") == 0 ) {
       algorithms.push_back(std::make_unique<MoveToFront>());
     }
+    else if ( c.compare("-O") == 0 ) {
+      algorithms.push_back(std::make_unique<Opt>());
+    }
+    else if ( c.compare("-o") == 0 ) {
+      algorithms.push_back(std::make_unique<OptFree>());
+    }
     else if ( c.compare("-D") == 0 ) {
       int dead_weight = 1;
       int alive_weight = 1;
@@ -125,8 +134,8 @@ int main(int argc, char* argv[]) {
     std::cout << "Invalid command line arguments\n";
     exit(-1);
   }
-  
 
+  // start clock
   auto start = std::chrono::system_clock::now();
   std::time_t start_time = std::chrono::system_clock::to_time_t(start);
   std::cout << "starting, " << algorithms.size() << " algorithms running\n";
@@ -147,6 +156,7 @@ int main(int argc, char* argv[]) {
 
   for ( int t = 0; t < number_of_trials; t++ ) {
     // create request sequence
+    // std::vector<int> request_sequence = {4, 4, 2, 0, 2};
     std::vector<int> request_sequence;
     for ( int i = 0; i < request_length; i++ ) {
       int request = rng();
@@ -163,5 +173,5 @@ int main(int argc, char* argv[]) {
   std::chrono::duration<double> elapsed_seconds = end-start;
   std::time_t end_time = std::chrono::system_clock::to_time_t(end);
   std::cout << "finished at " << std::ctime(&end_time);
-  std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
+  std::cout << "execution took: " << elapsed_seconds.count() << "s\n";
 }
