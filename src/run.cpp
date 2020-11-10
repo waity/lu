@@ -16,10 +16,9 @@
 #include "OptFree.h"
 
 
-typedef std::mt19937 engine_type;
-engine_type engine;
-
 auto setup_rng(bool seed_given, int seed, int max_value) {
+  typedef std::mt19937 engine_type;
+  engine_type engine;
   if ( !seed_given ) {
     srand((unsigned int)time(NULL));
     seed = rand();
@@ -33,6 +32,7 @@ auto setup_rng(bool seed_given, int seed, int max_value) {
   return rng;
 }
 
+
 void write_csv_line(std::ofstream &file, std::vector<std::string> &elements) {
   for ( uint i = 0; i < elements.size(); i++ ) {
     file << elements.at(i);
@@ -42,6 +42,7 @@ void write_csv_line(std::ofstream &file, std::vector<std::string> &elements) {
   }
   file << "\n";
 }
+
 
 void run_request_sequence(std::vector<std::unique_ptr<Algorithm>> &algorithms, std::vector<int> &request_sequence, int list_length, std::ofstream &file) {
   std::vector<std::string> line;
@@ -62,16 +63,20 @@ void run_request_sequence(std::vector<std::unique_ptr<Algorithm>> &algorithms, s
   write_csv_line(file, line);
 }
 
+
 /*
  * Arguments:
- * -r request length
- * -l list length
- * -n number of trials
+ * -request_length [length] request length
+ * -list_length [length] list length
+ * -num_trials [number] number of trials
  * -M mtf
  * -D dead or alive (discrete)
  * -d dead or alive (continuous)
- * -f file 
- * -s Seed
+ * -O Opt
+ * -o Free Opt
+ * -ALL all algorithms
+ * -file [name] file 
+ * -seed [seed] Seed
  */
 int main(int argc, char* argv[]) {
   int request_length, list_length, number_of_trials, seed;
@@ -79,17 +84,18 @@ int main(int argc, char* argv[]) {
   std::vector<std::unique_ptr<Algorithm>> algorithms;
   bool valid = true;
   bool seed_given = false;
+  bool from_file = false;
 
 
   for ( int i = 1; i < argc; i++ ) {
     std::string c = argv[i];
-    if ( c.compare("-r") == 0 ) {
+    if ( c.compare("-request_length") == 0 ) {
       request_length = std::stoi(argv[++i]);
     }
-    else if ( c.compare("-l") == 0 ) {
+    else if ( c.compare("-list_length") == 0 ) {
       list_length = std::stoi(argv[++i]);
     }
-    else if ( c.compare("-n") == 0 ) {
+    else if ( c.compare("-num_trials") == 0 ) {
       number_of_trials = std::stoi(argv[++i]);
     }
     else if ( c.compare("-M") == 0 ) {
@@ -102,21 +108,23 @@ int main(int argc, char* argv[]) {
       algorithms.push_back(std::make_unique<OptFree>());
     }
     else if ( c.compare("-D") == 0 ) {
-      int dead_weight = 1;
-      int alive_weight = 1;
-
-      algorithms.push_back(std::make_unique<DeadOrAlive>(dead_weight, alive_weight, false));
+      algorithms.push_back(std::make_unique<DeadOrAlive>(1, 1, false));
     }
     else if ( c.compare("-d") == 0 ) {
-      int dead_weight = 1;
-      int alive_weight = 1;
-
-      algorithms.push_back(std::make_unique<DeadOrAlive>(dead_weight, alive_weight, true));
+      algorithms.push_back(std::make_unique<DeadOrAlive>(1, 1, true));
     }
-    else if ( c.compare("-f") == 0 ) {
+    else if (c.compare("-ALL") == 0 ) {
+      algorithms.push_back(std::make_unique<MoveToFront>());
+      algorithms.push_back(std::make_unique<Opt>());
+      algorithms.push_back(std::make_unique<OptFree>());
+      algorithms.push_back(std::make_unique<DeadOrAlive>(1, 1, false));
+      algorithms.push_back(std::make_unique<DeadOrAlive>(1, 1, true));
+    }
+    else if ( c.compare("-file") == 0 ) {
       file_name = argv[++i];
+      from_file = true;
     }
-    else if ( c.compare("-s") == 0 ) {
+    else if ( c.compare("-seed") == 0 ) {
       seed = std::stoi(argv[++i]);
       seed_given = true;
     }
@@ -124,9 +132,13 @@ int main(int argc, char* argv[]) {
 
   // validate command line
   if ( algorithms.size() < 1 ) {
+    std::cout << "!";
     valid = false;
   }
-  else if ( (request_length == 0 || number_of_trials == 0) && file_name.length() < 1 ) {
+  else if ( (request_length == 0 || number_of_trials == 0) && !from_file ) {
+    valid = false;
+  }
+  else if ( list_length == 0 ) {
     valid = false;
   }
 
@@ -143,8 +155,8 @@ int main(int argc, char* argv[]) {
 
   auto rng = setup_rng(seed_given, seed, list_length - 1);
 
-  std::ofstream file;
-  file.open("results.csv");
+  std::ofstream out_file;
+  out_file.open("results.csv");
 
   std::vector<std::string> header;
   header.push_back("sequence");
@@ -152,22 +164,42 @@ int main(int argc, char* argv[]) {
     header.push_back(algorithms.at(i)->name());
   }
 
-  write_csv_line(file, header);
+  write_csv_line(out_file, header);
 
-  for ( int t = 0; t < number_of_trials; t++ ) {
-    // create request sequence
-    // std::vector<int> request_sequence = {4, 4, 2, 0, 2};
-    std::vector<int> request_sequence;
-    for ( int i = 0; i < request_length; i++ ) {
-      int request = rng();
-      request_sequence.push_back(request);
+  if ( from_file ) {
+    std::ifstream in_file;
+    in_file.open(file_name);
+    std::string line;
+    while ( std::getline(in_file,line) ) {
+      std::vector<int> request_sequence;
+
+      for(char c : line) {
+        request_sequence.push_back(c - '0');
+      }
+
+      run_request_sequence(algorithms, request_sequence, list_length, out_file);
     }
+ 
+    in_file.close();
+  }
+  else {
+    for ( int t = 0; t < number_of_trials; t++ ) {
+      // create request sequence
+      // std::vector<int> request_sequence = {4, 4, 2, 0, 2};
+      std::vector<int> request_sequence;
+      for ( int i = 0; i < request_length; i++ ) {
+        int request = rng();
+        request_sequence.push_back(request);
+      }
 
-    // run request sequence on algorithms.
-    run_request_sequence(algorithms, request_sequence, list_length, file);
+      // run request sequence on algorithms.
+      run_request_sequence(algorithms, request_sequence, list_length, out_file);
+    }
   }
 
-  file.close();
+  
+
+  out_file.close();
 
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end-start;
