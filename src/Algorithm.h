@@ -26,6 +26,7 @@ class Algorithm {
     int list_length;
     std::vector<int> list;
 
+    // useful for debugging.
     void print_list_ints(std::vector<int> l) {
       std::cout << "[";
       for (uint i=0; i < l.size(); i++){

@@ -132,7 +132,6 @@ int main(int argc, char* argv[]) {
 
   // validate command line
   if ( algorithms.size() < 1 ) {
-    std::cout << "!";
     valid = false;
   }
   else if ( (request_length == 0 || number_of_trials == 0) && !from_file ) {
