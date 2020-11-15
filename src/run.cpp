@@ -34,7 +34,7 @@ auto setup_rng(bool seed_given, int seed, int max_value) {
 
 
 void write_csv_line(std::ofstream &file, std::vector<std::string> &elements) {
-  for ( uint i = 0; i < elements.size(); i++ ) {
+  for ( size_t i = 0; i < elements.size(); i++ ) {
     file << elements.at(i);
     if ( i != elements.size() - 1 ) {
       file << ",";
@@ -48,13 +48,13 @@ void run_request_sequence(std::vector<std::unique_ptr<Algorithm>> &algorithms, s
   std::vector<std::string> line;
 
   std::stringstream ss;
-  for ( uint i = 0; i < request_sequence.size(); i++ ) {
+  for ( size_t i = 0; i < request_sequence.size(); i++ ) {
     ss << request_sequence.at(i);
   }
 
   line.push_back(ss.str());
   
-  for ( uint i = 0; i < algorithms.size(); i++ ) {
+  for ( size_t i = 0; i < algorithms.size(); i++ ) {
     algorithms.at(i)->setup(request_sequence, list_length);
     int result = algorithms.at(i)->run();
     line.push_back(std::to_string(result));
@@ -159,7 +159,7 @@ int main(int argc, char* argv[]) {
 
   std::vector<std::string> header;
   header.push_back("sequence");
-  for ( uint i = 0; i < algorithms.size(); i++ ) {
+  for ( size_t i = 0; i < algorithms.size(); i++ ) {
     header.push_back(algorithms.at(i)->name());
   }
 

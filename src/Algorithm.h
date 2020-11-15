@@ -29,7 +29,7 @@ class Algorithm {
     // useful for debugging.
     void print_list_ints(std::vector<int> l) {
       std::cout << "[";
-      for (uint i=0; i < l.size(); i++){
+      for (size_t i=0; i < l.size(); i++){
         std::cout << l[i];
         if (i != l.size() - 1) {
           std::cout << ", ";
