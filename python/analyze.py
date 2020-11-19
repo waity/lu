@@ -3,7 +3,6 @@ import sqlite3
 
 db_file = 'lu.db'
 
-
 def create_db():
   conn = sqlite3.connect(db_file)
   c = conn.cursor()
@@ -48,6 +47,7 @@ def run(listLength, requestLength):
   algorithm_id = {}
 
   with open('results.csv') as f:
+    added = 0
     for line in f:
       values = line.strip().split(',')
 
@@ -68,22 +68,25 @@ def run(listLength, requestLength):
         first_row = False
 
       else:
-        r = fetch_one('SELECT * FROM Sequence WHERE sequence=?', (values[headers.index('sequence')],))
+        r = fetch_one('SELECT * FROM Sequence WHERE sequence=? AND listLength=? AND requestLength=?', (values[headers.index('sequence')],listLength, requestLength))
         sequence_id = None
         if r == None:
           sequence_id = insert('INSERT INTO Sequence (listLength, requestLength, sequence) VALUES (?, ?, ?)',
             (listLength, requestLength, values[headers.index('sequence')]))
         else:
           sequence_id = r[0]
-
+       
         for algorithm in algorithms:
           if fetch_one('SELECT * FROM Cost WHERE sequenceID = ? AND algorithmID = ?', (sequence_id, algorithm_id[algorithm])) == None:
             insert('INSERT INTO Cost (sequenceID, cost, algorithmID) VALUES (?, ?, ?)', (sequence_id, values[headers.index(algorithm)], algorithm_id[algorithm]))
+            added += 1
 
 if __name__ == '__main__':
   # create_db()
-  for i in range(1, 5):
-    for j in range(1, 5):
-      subprocess.call(['./bin/run', '-list_length', str(i), '-request_length', str(j), '-num_trials', '10000', '-ALL'])
-      run(i, j)
-    
+  for c in range(1):
+    print('Starting round:' + (str(c)))
+    for i in range(5, 6):
+      for j in range(6, 7):
+        print('ll', i, 'rl', j)
+        subprocess.call(['./bin/run', '-list_length', str(i), '-request_length', str(j), '-num_trials', '10', '-ALL'])
+        run(i, j)
