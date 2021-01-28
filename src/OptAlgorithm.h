@@ -1,5 +1,7 @@
 #ifndef OPTALGORITHM
 #include "Algorithm.h"
+#include <climits>
+#include <algorithm> 
 // #include <bits/stdc++.h> 
 #define OPTALGORITHM
 class OptAlgorithm : public Algorithm {
