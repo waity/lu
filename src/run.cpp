@@ -48,9 +48,14 @@ void run_request_sequence(std::vector<std::unique_ptr<Algorithm>> &algorithms, s
   std::vector<std::string> line;
 
   std::stringstream ss;
+  ss << "\"";
   for ( uint i = 0; i < request_sequence.size(); i++ ) {
     ss << request_sequence.at(i);
+    if ( i != request_sequence.size() - 1 ) {
+      ss << ",";
+    }
   }
+  ss << "\"";
 
   line.push_back(ss.str());
   
@@ -61,6 +66,31 @@ void run_request_sequence(std::vector<std::unique_ptr<Algorithm>> &algorithms, s
   }
 
   write_csv_line(file, line);
+}
+
+std::vector<int> construct_sequence(int sequence_number, int base, int request_length) {
+  std::vector<int> ret(request_length);
+  for ( int i = 0; i < request_length; i++ ) {
+    int place = (int) (sequence_number / pow(base, (request_length - 1) - i)) % base;
+    sequence_number -= place  * base;
+    ret[i] = place;
+  }
+  return ret;
+}
+
+void next_sequence(std::vector<int> &sequence, int base, int request_length) {
+  int value;
+  for ( int i = request_length - 1; i >= 0; i-- ) {
+    value = sequence[i];
+    value += 1;
+    if (value >= base ) {
+      sequence[i] = 0;
+    }
+    else {
+      sequence[i] = value;
+      break;
+    }
+  }
 }
 
 
@@ -80,9 +110,11 @@ void run_request_sequence(std::vector<std::unique_ptr<Algorithm>> &algorithms, s
  * -initial [number] first trial to run (if provided, num_trials sequential from initial)
  */
 int main(int argc, char* argv[]) {
-  int request_length, list_length, number_of_trials, seed;
+  int request_length, list_length, number_of_trials, seed, initial_sequence_number, base;
   std::string file_name;
   std::vector<std::unique_ptr<Algorithm>> algorithms;
+
+  bool sequential = false;
   bool valid = true;
   bool seed_given = false;
   bool from_file = false;
@@ -94,6 +126,7 @@ int main(int argc, char* argv[]) {
     }
     else if ( c.compare("-list_length") == 0 ) {
       list_length = std::stoi(argv[++i]);
+      base = list_length;
     }
     else if ( c.compare("-num_trials") == 0 ) {
       number_of_trials = std::stoi(argv[++i]);
@@ -127,6 +160,10 @@ int main(int argc, char* argv[]) {
     else if ( c.compare("-seed") == 0 ) {
       seed = std::stoi(argv[++i]);
       seed_given = true;
+    }
+    else if ( c.compare("-initial") == 0 ) {
+      sequential = true;
+      initial_sequence_number = std::stoi(argv[++i]);
     }
   }
 
@@ -180,6 +217,13 @@ int main(int argc, char* argv[]) {
     }
  
     in_file.close();
+  }
+  else if ( sequential ) {
+    std::vector<int> request_sequence = construct_sequence(initial_sequence_number, base, request_length);
+    for ( int request = 0; request < number_of_trials; request++ ) {
+      run_request_sequence(algorithms, request_sequence, list_length, out_file);
+      next_sequence(request_sequence, base, request_length);
+    }
   }
   else {
     for ( int t = 0; t < number_of_trials; t++ ) {
