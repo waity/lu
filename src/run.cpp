@@ -75,8 +75,9 @@ void run_request_sequence(std::vector<std::unique_ptr<Algorithm>> &algorithms, s
  * -O Opt
  * -o Free Opt
  * -ALL all algorithms
- * -file [name] file 
+ * -file [name] file
  * -seed [seed] Seed
+ * -initial [number] first trial to run (if provided, num_trials sequential from initial)
  */
 int main(int argc, char* argv[]) {
   int request_length, list_length, number_of_trials, seed;
@@ -85,7 +86,6 @@ int main(int argc, char* argv[]) {
   bool valid = true;
   bool seed_given = false;
   bool from_file = false;
-
 
   for ( int i = 1; i < argc; i++ ) {
     std::string c = argv[i];
@@ -195,8 +195,6 @@ int main(int argc, char* argv[]) {
       run_request_sequence(algorithms, request_sequence, list_length, out_file);
     }
   }
-
-  
 
   out_file.close();
 

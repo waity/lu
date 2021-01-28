@@ -1,6 +1,6 @@
 #ifndef OPTALGORITHM
 #include "Algorithm.h"
-#include <bits/stdc++.h> 
+// #include <bits/stdc++.h> 
 #define OPTALGORITHM
 class OptAlgorithm : public Algorithm {
   public:

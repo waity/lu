@@ -6,6 +6,7 @@
 #define ALGORITHM
 class Algorithm {
   public:
+    virtual ~Algorithm() {}
     virtual std::string name() = 0;
     void setup(std::vector<int> request_sequence, int list_length) {
       Algorithm::request_length = request_sequence.size();
