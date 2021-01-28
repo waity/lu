@@ -68,6 +68,9 @@ void run_request_sequence(std::vector<std::unique_ptr<Algorithm>> &algorithms, s
   write_csv_line(file, line);
 }
 
+/**
+ * Generates a sequence based on the sequence number for a particular set of inputs.
+ */
 std::vector<int> construct_sequence(int sequence_number, int base, int request_length) {
   std::vector<int> ret(request_length);
   for ( int i = 0; i < request_length; i++ ) {
@@ -78,6 +81,9 @@ std::vector<int> construct_sequence(int sequence_number, int base, int request_l
   return ret;
 }
 
+/**
+ * Takes a sequence and generates the next sequence in order, given a base value
+ */
 void next_sequence(std::vector<int> &sequence, int base, int request_length) {
   int value;
   for ( int i = request_length - 1; i >= 0; i-- ) {
