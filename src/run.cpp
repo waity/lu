@@ -77,10 +77,8 @@ std::vector<int> construct_sequence(int sequence_number, int base, int request_l
     int place = (int) (sequence_number / pow(base, (request_length - 1) - i)) % base;
     sequence_number -= place  * pow(base, (request_length - 1) - i);
     ret[i] = place;
-    printf("%d %d\n", place, sequence_number);
   }
 
-  exit(1);
   return ret;
 }
 
