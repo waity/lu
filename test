@@ -1,1 +1,1 @@
-./bin/run -list_length 5 -request_length 10 -num_trials 10 -initial 10 -ALL
+./bin/run -list_length 5 -request_length 10 -num_trials 10 -initial 3000 -ALL
