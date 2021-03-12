@@ -5,6 +5,9 @@ create table Sequence (
   sequence VARCHAR(20)
 );
 
+CREATE UNIQUE INDEX uq_sequence
+  ON Sequence(listLength, requestLength, sequence);
+
 create table Cost (
   sequenceID INTEGER NOT NULL,
   cost SMALLINT UNSIGNED NOT NULL,

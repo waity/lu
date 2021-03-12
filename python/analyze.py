@@ -10,7 +10,7 @@ connection = sqlite3.connect(db_file)
 c = connection.cursor()
 
 def create_db():
-  conn = sqlite3.connect(db_file)
+  conn = sqlite3.connect('nabbed.db')
   c = conn.cursor()
   f = open('python/schema.sql')
   c.executescript(f.read())
@@ -71,15 +71,13 @@ def run(i, listLength, requestLength, filename=False):
       first_row = False
 
     else:
-      # r = fetch_one('SELECT * FROM Sequence WHERE sequence=? AND listLength=? AND requestLength=? LIMIT 1', (values[headers.index('sequence')],listLength, requestLength))
-      r = None
       sequence_id = None
-      if r == None:
+      # Because sequential, this is much faster than looking up if sequence exists already.
+      try:
         sequence_id = insert('INSERT INTO Sequence (listLength, requestLength, sequence) VALUES (?, ?, ?)',
           (listLength, requestLength, values[headers.index('sequence')]))
-        print(sequence_id)
-      else:
-        sequence_id = r[0]
+      except (sqlite3.IntegrityError):
+        return
       
       if fetch_one('SELECT * FROM Cost WHERE sequenceID = ? LIMIT 1', (sequence_id,)) == None:
         to_insert = []
@@ -88,10 +86,27 @@ def run(i, listLength, requestLength, filename=False):
         insert_many('INSERT INTO Cost (sequenceID, cost, algorithmID) VALUES (?, ?, ?)', to_insert)
   f.close()
 
+def run_one(listLength, requestLength, filename):
+  run(1, listLength, requestLength, filename)
 
 if __name__ == '__main__':
-  run(3, 5, 10, "important.csv")
+  # create_db()
+  db = input('database [1: lu-complete] [2: nabbed]: ')
+
+  if db == 1:
+    connection = sqlite3.connect('lu-complete.db')
+  elif db == 2:
+    connection = sqlite3.connect('nabbed.db')
+
+  c = connection.cursor()
+
+  ll = input('list length: ')
+  rl = input('request length: ')
+
+  
+  run_one(ll, rl, "important_rl_" + rl + "_ll_" + ll + ".csv")
   connection.commit()
-  # for i in tqdm(range(0, 3256)):
-  #   run(i, 5, 10)
-  #   connection.commit()
+
+  # for i in tqdm(range(0, 1)):
+    # run(i, listLength=ll, requestLength=rl)
+    # connection.commit()

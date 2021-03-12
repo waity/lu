@@ -4,7 +4,7 @@ import csv
 from tqdm.auto import trange
 import mysql.connector
 
-db_file = 'lu.db'
+db_file = 'lu-complete.db'
 
 connection = sqlite3.connect(db_file)
 c = connection.cursor()
@@ -46,6 +46,9 @@ if __name__ == '__main__':
   sequences = []
   costs = {}
 
+  ll = input('list length: ')
+  rl = input('request length: ')
+
   # start
 
   # query, params = get_sequences(1, 2, 5, 10)
@@ -69,7 +72,7 @@ if __name__ == '__main__':
   
   for j in trange(1, 6):
     for k in range(1, 6):
-      query, params = get_sequences(j, k, 5, 10)
+      query, params = get_sequences(j, k, ll, rl)
       rv = c.execute(query, params)
       for r in rv:
         sequences.append((r[0], r[1]))
@@ -83,9 +86,9 @@ if __name__ == '__main__':
           costs[r[0]][r[2]] = r[1]
 
 
-  f = open('important.csv', 'w')
+  f = open('important_rl_' + str(rl) + '_ll_' + str(ll) + '.csv', 'w')
   sequences = list(set(sequences))
-  f.write("sequences," + ",".join(algorithms.values()) + "\n")
+  f.write("sequence," + ",".join(algorithms.values()) + "\n")
   for s in sequences:
     f.write("\"" + s[1] + "\"," + ','.join([str(c) for c in costs[s[0]].values()]) + "\n")
   
