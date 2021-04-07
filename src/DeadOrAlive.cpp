@@ -25,7 +25,7 @@ int DeadOrAlive::move(int request, int request_index) {
   // for each element ahead of i in list, check if it is dead or alive.
   for ( int i = list_request_index - 1; i >= 0; i-- ) {
     std::vector<int>::iterator dead_or_alive = std::find(request_sequence.begin() + request_index + 1, seq_next_request_it, list[i]);
-    if (*dead_or_alive == list[i]) {
+    if ( *dead_or_alive == list[i] ) {
       doa_weight += alive_weight;
     }
     else {
@@ -38,7 +38,7 @@ int DeadOrAlive::move(int request, int request_index) {
     }
   }
 
-  if ( continuous && min_doa < 0 ) {
+  if ( continuous && min_doa <= 0 ) {
     list.erase(list_request_it);
     list.insert(list.begin() + discrete_pos, request);
   }

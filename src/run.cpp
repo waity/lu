@@ -59,19 +59,32 @@ void run_request_sequence(std::vector<std::unique_ptr<Algorithm>> &algorithms, s
 
   line.push_back(ss.str());
   
+  int cost_first;
+  int cost_second;
+
   for ( uint i = 0; i < algorithms.size(); i++ ) {
     algorithms.at(i)->setup(request_sequence, list_length);
     int result = algorithms.at(i)->run();
+    if ( i == 0 ) {
+      cost_first = result;
+    }
+    else {
+      cost_second = result;
+    }
     line.push_back(std::to_string(result));
   }
-
-  write_csv_line(file, line);
+  double cr = (((double) cost_first) / cost_second);
+  
+  // if ( cr >= 1.11 ) {
+    write_csv_line(file, line);
+  // }
+  std::cout << (((double) cost_first) / cost_second) << "  (" << ss.str() << ")" << "\n" ;
 }
 
 /**
  * Generates a sequence based on the sequence number for a particular set of inputs.
  */
-std::vector<int> construct_sequence(int sequence_number, int base, int request_length) {
+std::vector<int> construct_sequence(unsigned long long sequence_number, int base, int request_length) {
   std::vector<int> ret(request_length);
   for ( int i = 0; i < request_length; i++ ) {
     int place = (int) (sequence_number / pow(base, (request_length - 1) - i)) % base;
@@ -117,7 +130,8 @@ void next_sequence(std::vector<int> &sequence, int base, int request_length) {
  * -initial [number] first trial to run (if provided, num_trials sequential from initial)
  */
 int main(int argc, char* argv[]) {
-  int request_length, list_length, number_of_trials, seed, initial_sequence_number, base;
+  int request_length, list_length, number_of_trials, seed, base;
+  unsigned long long initial_sequence_number;
   std::string file_name;
   std::vector<std::unique_ptr<Algorithm>> algorithms;
 
@@ -170,7 +184,7 @@ int main(int argc, char* argv[]) {
     }
     else if ( c.compare("-initial") == 0 ) {
       sequential = true;
-      initial_sequence_number = std::stoi(argv[++i]);
+      initial_sequence_number = std::stol(argv[++i]);
     }
   }
 
