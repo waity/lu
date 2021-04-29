@@ -8,6 +8,7 @@
 struct TableEntry {
   int cost;
   std::vector<std::vector<int>> states;
+  std::vector<int> costs;
 };
 
 class OptAlgorithm : public Algorithm {
@@ -26,6 +27,7 @@ class OptAlgorithm : public Algorithm {
           int min;
           bool first_pass = true;
           std::vector<int> chosen;
+          int cost;
 
           for ( int previous_state_index = 0; previous_state_index < possible_state_count; previous_state_index++ ) {
             int previous_cost = table[table_index - 1][previous_state_index].cost;
@@ -40,25 +42,46 @@ class OptAlgorithm : public Algorithm {
               min = potential_cost;
               first_pass = false;
               table[table_index][state_index].states = table[table_index - 1][previous_state_index].states;
+              table[table_index][state_index].costs = table[table_index - 1][previous_state_index].costs;
               chosen = possible_states.at(state_index);
+              cost = min - previous_cost;
             }
             else if ( potential_cost < min ) {
               min = potential_cost;
               table[table_index][state_index].states = table[table_index - 1][previous_state_index].states;
+              table[table_index][state_index].costs = table[table_index - 1][previous_state_index].costs;
               chosen = possible_states.at(state_index);
+              cost = min - previous_cost;
             }
             
           }
           table[table_index][state_index].cost = min;
+          table[table_index][state_index].costs.push_back(cost);
           table[table_index][state_index].states.push_back(chosen);
         }
       }
 
       possible_states.clear();
       auto min = std::min_element(table[request_length], table[request_length] + possible_state_count, [] (TableEntry const& lhs, TableEntry const& rhs) {return lhs.cost < rhs.cost;});
-      for ( std::vector<int> state : min->states ) {
-        print_list_ints(state);
+      for ( struct TableEntry e : table[request_length] ) {
+        if ( e.cost == min->cost ) {
+          int i = 0;
+          std::cout << "possible solution " << name() << " \n";
+          for ( std::vector<int> state : e.states ) {
+            // DEBUG
+            std::cout << min->costs[i] << " ";
+            print_list_ints(state);
+            i++;
+          }
+        }
       }
+      // int i = 0;
+      // for ( std::vector<int> state : min->states ) {
+      //   // DEBUG
+      //   std::cout << min->costs[i] << " ";
+      //   print_list_ints(state);
+      //   i++;
+      // }
       return min->cost;
     };
   protected:

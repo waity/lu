@@ -1,2 +1,2 @@
-sequence,continuous doa,opt
-"4,2,3,4,1,3,2,1",29,24
+sequence,continuous doa,opt,opt free
+"4,2,3,4,1,3,2,1",29,24,27
