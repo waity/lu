@@ -44,7 +44,7 @@ void write_csv_line(std::ofstream &file, std::vector<std::string> &elements) {
 }
 
 
-void run_request_sequence(std::vector<std::unique_ptr<Algorithm>> &algorithms, std::vector<int> &request_sequence, int list_length, std::ofstream &file) {
+void run_request_sequence(int i, std::vector<std::unique_ptr<Algorithm>> &algorithms, std::vector<int> &request_sequence, int list_length, std::ofstream &file) {
   std::vector<std::string> line;
 
   std::stringstream ss;
@@ -74,11 +74,10 @@ void run_request_sequence(std::vector<std::unique_ptr<Algorithm>> &algorithms, s
     line.push_back(std::to_string(result));
   }
   double cr = (((double) cost_first) / cost_second);
-  
-  // if ( cr >= 1.11 ) {
-    write_csv_line(file, line);
+  write_csv_line(file, line);
+  // if ( cr >= 1.1 ) {
+  std::cout << i << " " << (((double) cost_first) / cost_second) << "  (" << ss.str() << ")" << "\n" ;
   // }
-  std::cout << (((double) cost_first) / cost_second) << "  (" << ss.str() << ")" << "\n" ;
 }
 
 /**
@@ -227,14 +226,31 @@ int main(int argc, char* argv[]) {
     std::ifstream in_file;
     in_file.open(file_name);
     std::string line;
+    int i = 0;
     while ( std::getline(in_file,line) ) {
       std::vector<int> request_sequence;
-
-      for(char c : line) {
+      bool first = true;
+      bool skip = false;
+      for( char c : line ) {
+        if ( first ) {
+          if ( c == '#' ) {
+            skip = true;
+            break;
+          }
+          else {
+            first = false;
+          }
+        }
+        if ( c == ',' ) {
+          continue;
+        }
         request_sequence.push_back(c - '0');
       }
-
-      run_request_sequence(algorithms, request_sequence, list_length, out_file);
+      
+      if ( !skip ) {
+        run_request_sequence(i, algorithms, request_sequence, list_length, out_file);
+      }
+      i += 1;
     }
  
     in_file.close();
@@ -242,7 +258,7 @@ int main(int argc, char* argv[]) {
   else if ( sequential ) {
     std::vector<int> request_sequence = construct_sequence(initial_sequence_number, base, request_length);
     for ( int request = 0; request < number_of_trials; request++ ) {
-      run_request_sequence(algorithms, request_sequence, list_length, out_file);
+      run_request_sequence(request, algorithms, request_sequence, list_length, out_file);
       next_sequence(request_sequence, base, request_length);
     }
   }
@@ -257,7 +273,7 @@ int main(int argc, char* argv[]) {
       }
 
       // run request sequence on algorithms.
-      run_request_sequence(algorithms, request_sequence, list_length, out_file);
+      run_request_sequence(t, algorithms, request_sequence, list_length, out_file);
     }
   }
 

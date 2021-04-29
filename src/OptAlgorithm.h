@@ -4,25 +4,31 @@
 #include <algorithm> 
 // #include <bits/stdc++.h> 
 #define OPTALGORITHM
+
+struct TableEntry {
+  int cost;
+  std::vector<std::vector<int>> states;
+};
+
 class OptAlgorithm : public Algorithm {
   public:
     virtual std::string name() = 0;
     int run() {
       populate_states();
-      int table[request_length + 1][possible_state_count];
+      struct TableEntry table[request_length + 1][possible_state_count];
       // fill first row; cost to shift from initial state to each state.
       for ( int i = 0; i < possible_state_count; i++ ) {
-        table[0][i] = shift(list, possible_states.at(i), -1);
+        table[0][i].cost = shift(list, possible_states.at(i), -1);
       }
       for ( int request_index = 0; request_index < request_length; request_index++ ) {
         int table_index = request_index + 1;
         for ( int state_index = 0; state_index < possible_state_count; state_index++ ) {
           int min;
           bool first_pass = true;
+          std::vector<int> chosen;
 
           for ( int previous_state_index = 0; previous_state_index < possible_state_count; previous_state_index++ ) {
-
-            int previous_cost = table[table_index - 1][previous_state_index];
+            int previous_cost = table[table_index - 1][previous_state_index].cost;
             int shift_cost = shift(possible_states.at(previous_state_index), possible_states.at(state_index), request_index);
             int potential_cost = INT_MAX;
 
@@ -33,18 +39,27 @@ class OptAlgorithm : public Algorithm {
             if ( first_pass ) {
               min = potential_cost;
               first_pass = false;
+              table[table_index][state_index].states = table[table_index - 1][previous_state_index].states;
+              chosen = possible_states.at(state_index);
             }
             else if ( potential_cost < min ) {
               min = potential_cost;
+              table[table_index][state_index].states = table[table_index - 1][previous_state_index].states;
+              chosen = possible_states.at(state_index);
             }
             
           }
-          table[table_index][state_index] = min;
+          table[table_index][state_index].cost = min;
+          table[table_index][state_index].states.push_back(chosen);
         }
       }
 
       possible_states.clear();
-      return *std::min_element(table[request_length], table[request_length] + possible_state_count);
+      auto min = std::min_element(table[request_length], table[request_length] + possible_state_count, [] (TableEntry const& lhs, TableEntry const& rhs) {return lhs.cost < rhs.cost;});
+      for ( std::vector<int> state : min->states ) {
+        print_list_ints(state);
+      }
+      return min->cost;
     };
   protected:
     int possible_state_count = 0;
