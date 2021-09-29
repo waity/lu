@@ -4,7 +4,7 @@ import csv
 from tqdm.auto import trange
 import mysql.connector
 
-db_file = 'lu-complete.db'
+db_file = 'lu-complete-fixed.db'
 
 connection = sqlite3.connect(db_file)
 c = connection.cursor()

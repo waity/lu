@@ -4,13 +4,13 @@ import csv
 from tqdm import tqdm
 import mysql.connector
 
-db_file = 'nabbed.db'
+db_file = 'nabbed-fixed.db'
 
 connection = sqlite3.connect(db_file)
 c = connection.cursor()
 
 def create_db():
-  conn = sqlite3.connect('nabbed.db')
+  conn = sqlite3.connect('nabbed-fixed.db')
   c = conn.cursor()
   f = open('python/schema.sql')
   c.executescript(f.read())
@@ -91,12 +91,6 @@ def run_one(listLength, requestLength, filename):
 
 if __name__ == '__main__':
   # create_db()
-  db = input('database [1: lu-complete] [2: nabbed]: ')
-
-  if db == 1:
-    connection = sqlite3.connect('lu-complete.db')
-  elif db == 2:
-    connection = sqlite3.connect('nabbed.db')
 
   c = connection.cursor()
 

@@ -4,19 +4,19 @@ import csv
 from tqdm import tqdm
 import mysql.connector
 
-db_file = 'nabbed.db'
+db_file = 'lu-complete-fixed.db'
 
 connection = sqlite3.connect(db_file)
 c = connection.cursor()
 
 if __name__ == '__main__':
-  a = c.execute('select COUNT(*) from sequence where listlength = ? and requestlength = ?', (5, 4))
+  a = c.execute('select * from sequence where sequence = ? and listlength = ? and requestlength = ?', ("0,2,4,0,2,0,0,2,4", 5, 10))
   for i in a:
     print(i)
 
-  # a = c.execute('select * from cost where sequenceID = ?', ('8666941',))
-  # for i in a:
-  #   print(i)
+  a = c.execute('select * from cost where sequenceID = ?', ('11719238',))
+  for i in a:
+    print(i)
 
   # a = c.execute('select * from algorithm')
   # for i in a:
