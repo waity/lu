@@ -1,1 +1,1 @@
-./bin/run -list_length 5 -request_length 12 -file input -d -O -o
+./bin/run -list_length 6 -request_length 6 -file input -d -O

@@ -66,21 +66,24 @@ class OptAlgorithm : public Algorithm {
       for ( struct TableEntry e : table[request_length] ) {
         if ( e.cost == min->cost ) {
           int i = 0;
-          std::cout << "possible solution " << name() << " \n";
+          // std::cout << "possible solution " << name() << " \n";
           for ( std::vector<int> state : e.states ) {
             // DEBUG
-            std::cout << min->costs[i] << " ";
-            print_list_ints(state);
+            // std::cout << min->costs[i] << " ";
+            // print_list_ints(state);
             i++;
           }
         }
       }
+
+
+      // FULL DEBUG
       // int i = 0;
       // for ( std::vector<int> state : min->states ) {
-      //   // DEBUG
-      //   std::cout << min->costs[i] << " ";
-      //   print_list_ints(state);
-      //   i++;
+        // DEBUG
+        // std::cout << min->costs[i] << " ";
+        // print_list_ints(state);
+        // i++;
       // }
       return min->cost;
     };

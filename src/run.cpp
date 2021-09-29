@@ -44,7 +44,7 @@ void write_csv_line(std::ofstream &file, std::vector<std::string> &elements) {
 }
 
 
-void run_request_sequence(int i, std::vector<std::unique_ptr<Algorithm>> &algorithms, std::vector<int> &request_sequence, int list_length, std::ofstream &file) {
+double run_request_sequence(int i, std::vector<std::unique_ptr<Algorithm>> &algorithms, std::vector<int> &request_sequence, int list_length, std::ofstream &file) {
   std::vector<std::string> line;
 
   std::stringstream ss;
@@ -74,10 +74,11 @@ void run_request_sequence(int i, std::vector<std::unique_ptr<Algorithm>> &algori
     line.push_back(std::to_string(result));
   }
   double cr = (((double) cost_first) / cost_second);
-  write_csv_line(file, line);
-  // if ( cr >= 1.1 ) {
-  std::cout << i << " " << (((double) cost_first) / cost_second) << "  (" << ss.str() << ")" << "\n" ;
-  // }
+  if ( cr >= 1.15 ) {
+    write_csv_line(file, line);
+    std::cout << i << " " << cr << "  (" << ss.str() << ")" << "\n" ;
+  }
+  return cr;
 }
 
 /**
@@ -207,7 +208,7 @@ int main(int argc, char* argv[]) {
   auto start = std::chrono::system_clock::now();
   std::time_t start_time = std::chrono::system_clock::to_time_t(start);
   std::cout << "starting, " << algorithms.size() << " algorithms running\n";
-  std::cout << "start time: " << std::ctime(&start_time);
+  std::cout << "start: " << std::ctime(&start_time);
 
   auto rng = setup_rng(seed_given, seed, list_length - 1);
 
@@ -257,9 +258,16 @@ int main(int argc, char* argv[]) {
   }
   else if ( sequential ) {
     std::vector<int> request_sequence = construct_sequence(initial_sequence_number, base, request_length);
+    double highestCr = 0;
     for ( int request = 0; request < number_of_trials; request++ ) {
-      run_request_sequence(request, algorithms, request_sequence, list_length, out_file);
+      double cr = run_request_sequence(request, algorithms, request_sequence, list_length, out_file);
       next_sequence(request_sequence, base, request_length);
+      if ( cr > highestCr ) {
+        highestCr = cr;
+      }
+      if ( request % 1000 == 0 ) {
+        std::cout << "Highest cr: (@" << request << "): " << highestCr << "\n";
+      }
     }
   }
   else {
@@ -282,6 +290,6 @@ int main(int argc, char* argv[]) {
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end-start;
   std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-  std::cout << "finished at " << std::ctime(&end_time);
+  std::cout << "finished: " << std::ctime(&end_time);
   std::cout << "execution took: " << elapsed_seconds.count() << "s\n";
 }
