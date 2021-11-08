@@ -74,9 +74,9 @@ double run_request_sequence(int i, std::vector<std::unique_ptr<Algorithm>> &algo
     line.push_back(std::to_string(result));
   }
   double cr = (((double) cost_first) / cost_second);
-  if ( cr >= 1.15 ) {
+  if ( cr < 1 ) {
     write_csv_line(file, line);
-    std::cout << i << " " << cr << "  (" << ss.str() << ")" << "\n" ;
+  // std::cout << i << " " << cr << "  (" << ss.str() << ")" << "\n" ;
   }
   return cr;
 }
@@ -264,9 +264,6 @@ int main(int argc, char* argv[]) {
       next_sequence(request_sequence, base, request_length);
       if ( cr > highestCr ) {
         highestCr = cr;
-      }
-      if ( request % 1000 == 0 ) {
-        std::cout << "Highest cr: (@" << request << "): " << highestCr << "\n";
       }
     }
   }
