@@ -73,7 +73,7 @@ double run_request_sequence(int i, std::vector<std::unique_ptr<Algorithm>> &algo
     }
     line.push_back(std::to_string(result));
   }
-  double cr = (((double) cost_first) / cost_second);
+  double cr = (((double) cost_second) / cost_first);
   if ( cr < 1 ) {
     write_csv_line(file, line);
   // std::cout << i << " " << cr << "  (" << ss.str() << ")" << "\n" ;
