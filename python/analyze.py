@@ -4,13 +4,14 @@ import csv
 from tqdm import tqdm
 import mysql.connector
 
-db_file = 'nabbed-fixed.db'
+db_file = 'bijective.db'
 
 connection = sqlite3.connect(db_file)
 c = connection.cursor()
 
 def create_db():
-  conn = sqlite3.connect('nabbed-fixed.db')
+  global db_file
+  conn = sqlite3.connect(db_file)
   c = conn.cursor()
   f = open('python/schema.sql')
   c.executescript(f.read())
@@ -37,7 +38,7 @@ def insert_many(s, v):
   return c.lastrowid
 
 
-def run(i, listLength, requestLength, filename=False):
+def run(num_files, listLength, requestLength, filename=False):
   first_row = True
 
   headers = []
@@ -49,12 +50,12 @@ def run(i, listLength, requestLength, filename=False):
   if filename:
     f = open(filename)
   else:
-    f = open('results/results_' + str(i) + '.csv')
+    f = open('results/results_' + str(num_files) + '.csv')
 
   for line in csv.reader(f, delimiter=","):
     values = list(line)
 
-    # if first row, grab algorithms, insert
+    # if first row, grab algorithms or insert
     if first_row:
       headers = values
 
@@ -90,15 +91,11 @@ def run_one(listLength, requestLength, filename):
   run(1, listLength, requestLength, filename)
 
 if __name__ == '__main__':
-  # create_db()
+  create_db()
 
   c = connection.cursor()
-
-  ll = input('list length: ')
-  rl = input('request length: ')
-
   
-  run_one(ll, rl, "important_rl_" + rl + "_ll_" + ll + ".csv")
+  run_one(5, 30, "results/results_1.csv")
   connection.commit()
 
   # for i in tqdm(range(0, 1)):
