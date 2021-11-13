@@ -1,1 +1,2 @@
-./bin/run -list_length 25 -request_length 5 -initial 0 -num_trials 10 -d -M
+#./bin/run -list_length 5 -request_length 30 -d -M -initial $(($1*$2)) -num_trials $2
+./bin/run -list_length 5 -request_length 100 -file i2 -O -d -o

@@ -80,10 +80,10 @@ class OptAlgorithm : public Algorithm {
       // FULL DEBUG
       // int i = 0;
       // for ( std::vector<int> state : min->states ) {
-        // DEBUG
-        // std::cout << min->costs[i] << " ";
-        // print_list_ints(state);
-        // i++;
+      //   // DEBUG
+      //   std::cout << min->costs[i] << " ";
+      //   print_list_ints(state);
+      //   i++;
       // }
       return min->cost;
     };
