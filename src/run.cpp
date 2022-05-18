@@ -139,7 +139,7 @@ int main(int argc, char* argv[]) {
   bool valid = true;
   bool seed_given = false;
   bool from_file = false;
-  bool debug = true;
+  bool debug = false;
 
   for ( int i = 1; i < argc; i++ ) {
     std::string c = argv[i];
@@ -186,6 +186,9 @@ int main(int argc, char* argv[]) {
     else if ( c.compare("-initial") == 0 ) {
       sequential = true;
       initial_sequence_number = std::stol(argv[++i]);
+    }    
+    else if ( c.compare("-debug") == 0 ) {
+      debug = true;
     }
   }
 
