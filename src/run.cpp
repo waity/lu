@@ -44,9 +44,8 @@ void write_csv_line(std::ofstream &file, std::vector<std::string> &elements) {
 }
 
 
-double run_request_sequence(int i, std::vector<std::unique_ptr<Algorithm>> &algorithms, std::vector<int> &request_sequence, int list_length, std::ofstream &file) {
+double run_request_sequence(bool debug, int i, std::vector<std::unique_ptr<Algorithm>> &algorithms, std::vector<int> &request_sequence, int list_length, std::ofstream &file) {
   std::vector<std::string> line;
-
   std::stringstream ss;
   ss << "\"";
   for ( uint i = 0; i < request_sequence.size(); i++ ) {
@@ -64,7 +63,7 @@ double run_request_sequence(int i, std::vector<std::unique_ptr<Algorithm>> &algo
 
   for ( uint i = 0; i < algorithms.size(); i++ ) {
     algorithms.at(i)->setup(request_sequence, list_length);
-    int result = algorithms.at(i)->run();
+    int result = algorithms.at(i)->run(debug);
     if ( i == 0 ) {
       cost_first = result;
     }
@@ -74,10 +73,11 @@ double run_request_sequence(int i, std::vector<std::unique_ptr<Algorithm>> &algo
     line.push_back(std::to_string(result));
   }
   double cr = (((double) cost_second) / cost_first);
-  // if ( cr < 1 || cr > 1.3 ) {
-  write_csv_line(file, line);
-  // std::cout << i << " " << cr << "  (" << ss.str() << ")" << "\n" ;
-  // }
+
+  if ( debug ) {
+    write_csv_line(file, line);
+    std::cout << i << " " << cr << "  (" << ss.str() << ")" << "\n" ;
+  }
   return cr;
 }
 
@@ -139,6 +139,7 @@ int main(int argc, char* argv[]) {
   bool valid = true;
   bool seed_given = false;
   bool from_file = false;
+  bool debug = true;
 
   for ( int i = 1; i < argc; i++ ) {
     std::string c = argv[i];
@@ -249,7 +250,7 @@ int main(int argc, char* argv[]) {
       }
       
       if ( !skip ) {
-        run_request_sequence(i, algorithms, request_sequence, list_length, out_file);
+        run_request_sequence(debug, i, algorithms, request_sequence, list_length, out_file);
       }
       i += 1;
     }
@@ -260,7 +261,7 @@ int main(int argc, char* argv[]) {
     std::vector<int> request_sequence = construct_sequence(initial_sequence_number, base, request_length);
     double highestCr = 0;
     for ( int request = 0; request < number_of_trials; request++ ) {
-      double cr = run_request_sequence(request, algorithms, request_sequence, list_length, out_file);
+      double cr = run_request_sequence(debug, request, algorithms, request_sequence, list_length, out_file);
       next_sequence(request_sequence, base, request_length);
       if ( cr > highestCr ) {
         highestCr = cr;
@@ -278,7 +279,7 @@ int main(int argc, char* argv[]) {
       }
 
       // run request sequence on algorithms.
-      run_request_sequence(t, algorithms, request_sequence, list_length, out_file);
+      run_request_sequence(debug, t, algorithms, request_sequence, list_length, out_file);
     }
   }
 

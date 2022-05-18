@@ -19,7 +19,7 @@ class Algorithm {
       }
     }
 
-    virtual int run() = 0;
+    virtual int run(bool debug) = 0;
 
   protected:
     int request_length;

@@ -14,7 +14,7 @@ struct TableEntry {
 class OptAlgorithm : public Algorithm {
   public:
     virtual std::string name() = 0;
-    int run() {
+    int run(bool debug) {
       populate_states();
       struct TableEntry table[request_length + 1][possible_state_count];
       // fill first row; cost to shift from initial state to each state.
@@ -66,25 +66,17 @@ class OptAlgorithm : public Algorithm {
       for ( struct TableEntry e : table[request_length] ) {
         if ( e.cost == min->cost ) {
           int i = 0;
-          // std::cout << "possible solution " << name() << " \n";
-          for ( std::vector<int> state : e.states ) {
-            // DEBUG
-            // std::cout << min->costs[i] << " ";
-            // print_list_ints(state);
-            i++;
+          if ( debug ) {
+            std::cout << "possible solution " << name() << " \n";
+            for ( std::vector<int> state : e.states ) {
+              // DEBUG
+              std::cout << min->costs[i] << " ";
+              print_list_ints(state);
+              i++;
+            }
           }
         }
       }
-
-
-      // FULL DEBUG
-      // int i = 0;
-      // for ( std::vector<int> state : min->states ) {
-      //   // DEBUG
-      //   std::cout << min->costs[i] << " ";
-      //   print_list_ints(state);
-      //   i++;
-      // }
       return min->cost;
     };
   protected:

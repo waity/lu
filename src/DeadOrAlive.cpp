@@ -30,8 +30,8 @@ int DeadOrAlive::move(int request, int request_index) {
     }
     else {
       doa_weight -= dead_weight;
-      // if continuous, check most dead update position
-      if ( continuous && doa_weight < min_doa ) {
+      // if continuous, check most dead update position (TYPE TOGGLE)
+      if ( continuous && doa_weight <= min_doa ) {
         min_doa = doa_weight;
         discrete_pos = i;
       }
