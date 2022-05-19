@@ -1,5 +1,5 @@
 #ifndef DEADORALIVE
-#include "MTFAlgorithm.h"
+#include "_MTFAlgorithm.h"
 #define DEADORALIVE
   class DeadOrAlive : public MTFAlgorithm {
     public:

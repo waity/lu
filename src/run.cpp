@@ -76,7 +76,7 @@ double run_request_sequence(bool debug, int i, std::vector<std::unique_ptr<Algor
 
   if ( debug ) {
     write_csv_line(file, line);
-    std::cout << i << " " << cr << "  (" << ss.str() << ")" << "\n" ;
+    // std::cout << i << " " << cr << "  (" << ss.str() << ")" << "\n" ;
   }
   return cr;
 }

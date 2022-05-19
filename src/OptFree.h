@@ -1,5 +1,5 @@
 #ifndef OPTFREE
-#include "OptAlgorithm.h"
+#include "_OptAlgorithm.h"
 #define OPTFREE
   class OptFree : public OptAlgorithm {
     public:

@@ -1,5 +1,5 @@
 #ifndef OPT
-#include "OptAlgorithm.h"
+#include "_OptAlgorithm.h"
 #define OPT
   class Opt : public OptAlgorithm {
     public:

@@ -14,13 +14,17 @@ struct TableEntry {
 class OptAlgorithm : public Algorithm {
   public:
     virtual std::string name() = 0;
+
     int run(bool debug) {
       populate_states();
+
       struct TableEntry table[request_length + 1][possible_state_count];
+
       // fill first row; cost to shift from initial state to each state.
       for ( int i = 0; i < possible_state_count; i++ ) {
         table[0][i].cost = shift(list, possible_states.at(i), -1);
       }
+
       for ( int request_index = 0; request_index < request_length; request_index++ ) {
         int table_index = request_index + 1;
         for ( int state_index = 0; state_index < possible_state_count; state_index++ ) {
@@ -63,17 +67,23 @@ class OptAlgorithm : public Algorithm {
 
       possible_states.clear();
       auto min = std::min_element(table[request_length], table[request_length] + possible_state_count, [] (TableEntry const& lhs, TableEntry const& rhs) {return lhs.cost < rhs.cost;});
+
+      if ( debug ) { 
+        std::cout<< name() << "\n";
+      }
+
       for ( struct TableEntry e : table[request_length] ) {
         if ( e.cost == min->cost ) {
           int i = 0;
           if ( debug ) {
-            std::cout << "possible solution " << name() << " \n";
+            Algorithm::print_list_ints(list);
             for ( std::vector<int> state : e.states ) {
               // DEBUG
-              std::cout << min->costs[i] << " ";
-              print_list_ints(state);
+              // std::cout << min->costs[i] << " ";
+              Algorithm::print_list_ints(state);
               i++;
             }
+            if ( debug ) { std::cout << std::endl;}
           }
         }
       }
@@ -82,12 +92,14 @@ class OptAlgorithm : public Algorithm {
   protected:
     int possible_state_count = 0;
     std::vector<std::vector<int>> possible_states;
+
     void populate_states() {
       do {
         possible_states.push_back(list);
       } while (std::next_permutation(list.begin(), list.end()));
       possible_state_count = possible_states.size();
     }
+    
     int access_cost(std::vector<int> state, int request_index) {
       int request = request_sequence.at(request_index);
       std::vector<int>::iterator list_request_it = std::find(state.begin(), state.end(), request);
@@ -95,6 +107,7 @@ class OptAlgorithm : public Algorithm {
       int cost = list_request_index + 1;
       return cost;
     }
+
   private:
     virtual int shift(std::vector<int> from, std::vector<int> to, int request_index) = 0;
 };

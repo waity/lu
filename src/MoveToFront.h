@@ -1,5 +1,5 @@
 #ifndef MOVETOFRONT
-#include "MTFAlgorithm.h"
+#include "_MTFAlgorithm.h"
 #define MOVETOFRONT
   class MoveToFront : public MTFAlgorithm {
     public:
