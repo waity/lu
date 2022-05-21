@@ -57,6 +57,7 @@ double run_request_sequence(bool debug, int i, std::vector<std::unique_ptr<Algor
   ss << "\"";
 
   line.push_back(ss.str());
+  std::cout << ss.str() << std::endl;
   
   int cost_first;
   int cost_second;
