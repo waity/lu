@@ -1,3 +1,5 @@
 build/
 bin/
+tmp
+.DS_STORE
 .vscode/
