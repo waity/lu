@@ -3,3 +3,6 @@ bin/
 tmp
 .DS_STORE
 .vscode/
+input
+scratch
+results.csv
