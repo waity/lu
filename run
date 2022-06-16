@@ -1,6 +1,5 @@
 rm -rf tmp
 mkdir tmp
-./bin/run -list_length $2 -request_length 16 -file input -O -d $1 >> tmp/out
-# ./bin/run -list_length 2 -request_length 20 -initial 0 -num_trials 1048576 -O -d
+./bin/run -list_length $1 -request_length 16 -file input -O -d -debug >> tmp/out
 python3 ./utilities/colorizer.py
 rm -rf tmp

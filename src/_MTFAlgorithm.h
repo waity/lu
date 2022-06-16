@@ -1,5 +1,5 @@
 #ifndef MTFALGORITHM
-#include "Algorithm.h"
+#include "_Algorithm.h"
 #define MTFALGORITHM
 class MTFAlgorithm : public Algorithm {
   public:

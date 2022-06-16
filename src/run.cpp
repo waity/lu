@@ -9,7 +9,7 @@
 #include <chrono>
 #include <ctime>
 #include <thread>
-#include "Algorithm.h"
+#include "_Algorithm.h"
 #include "MoveToFront.h"
 #include "DeadOrAlive.h"
 #include "Opt.h"
@@ -47,6 +47,7 @@ void write_csv_line(std::ofstream &file, std::vector<std::string> &elements) {
 double run_request_sequence(bool debug, int i, std::vector<std::unique_ptr<Algorithm>> &algorithms, std::vector<int> &request_sequence, int list_length, std::ofstream &file) {
   std::vector<std::string> line;
   std::stringstream ss;
+
   ss << "\"";
   for ( uint i = 0; i < request_sequence.size(); i++ ) {
     ss << request_sequence.at(i);
@@ -57,7 +58,10 @@ double run_request_sequence(bool debug, int i, std::vector<std::unique_ptr<Algor
   ss << "\"";
 
   line.push_back(ss.str());
-  std::cout << ss.str() << std::endl;
+
+  if ( debug ) {
+    std::cout << ss.str() << std::endl;
+  }
   
   int cost_first;
   int cost_second;
@@ -73,13 +77,8 @@ double run_request_sequence(bool debug, int i, std::vector<std::unique_ptr<Algor
     }
     line.push_back(std::to_string(result));
   }
-  double cr = (((double) cost_second) / cost_first);
-
-  if ( debug ) {
-    write_csv_line(file, line);
-    // std::cout << i << " " << cr << "  (" << ss.str() << ")" << "\n" ;
-  }
-  return cr;
+  write_csv_line(file, line);
+  return (((double) cost_second) / cost_first);
 }
 
 /**
@@ -247,7 +246,7 @@ int main(int argc, char* argv[]) {
             first = false;
           }
         }
-        if ( c == ',' ) {
+        if ( c == ',' || c == ' ' ) {
           continue;
         }
         request_sequence.push_back(c - '0');
@@ -274,8 +273,6 @@ int main(int argc, char* argv[]) {
   }
   else {
     for ( int t = 0; t < number_of_trials; t++ ) {
-      // create request sequence
-      // std::vector<int> request_sequence = {4, 4, 2, 0, 2};
       std::vector<int> request_sequence;
       for ( int i = 0; i < request_length; i++ ) {
         int request = rng();

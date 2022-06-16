@@ -1,8 +1,7 @@
 #ifndef OPTALGORITHM
-#include "Algorithm.h"
+#include "_Algorithm.h"
 #include <climits>
-#include <algorithm> 
-// #include <bits/stdc++.h> 
+#include <algorithm>
 #define OPTALGORITHM
 
 struct TableEntry {
@@ -20,7 +19,6 @@ class OptAlgorithm : public Algorithm {
 
       struct TableEntry table[request_length + 1][possible_state_count];
 
-      // fill first row; cost to shift from initial state to each state.
       for ( int i = 0; i < possible_state_count; i++ ) {
         table[0][i].cost = shift(list, possible_states.at(i), -1);
       }
@@ -29,7 +27,6 @@ class OptAlgorithm : public Algorithm {
         int table_index = request_index + 1;
         for ( int state_index = 0; state_index < possible_state_count; state_index++ ) {
           int min;
-          bool first_pass = true;
           std::vector<int> chosen;
           int cost;
 
@@ -41,24 +38,16 @@ class OptAlgorithm : public Algorithm {
             if ( shift_cost != INT_MAX && previous_cost != INT_MAX ) {
               potential_cost = previous_cost + shift_cost + access_cost(possible_states.at(previous_state_index), request_index);
             }
-
-            if ( first_pass ) {
-              min = potential_cost;
-              first_pass = false;
-              table[table_index][state_index].states = table[table_index - 1][previous_state_index].states;
-              table[table_index][state_index].costs = table[table_index - 1][previous_state_index].costs;
-              chosen = possible_states.at(state_index);
-              cost = min - previous_cost;
-            }
-            else if ( potential_cost < min ) {
-              min = potential_cost;
-              table[table_index][state_index].states = table[table_index - 1][previous_state_index].states;
-              table[table_index][state_index].costs = table[table_index - 1][previous_state_index].costs;
-              chosen = possible_states.at(state_index);
-              cost = min - previous_cost;
-            }
             
+            if ( previous_state_index == 0 || potential_cost < min ) {
+              min = potential_cost;
+              table[table_index][state_index].states = table[table_index - 1][previous_state_index].states;
+              table[table_index][state_index].costs = table[table_index - 1][previous_state_index].costs;
+              chosen = possible_states.at(state_index);
+              cost = min - previous_cost;
+            }
           }
+
           table[table_index][state_index].cost = min;
           table[table_index][state_index].costs.push_back(cost);
           table[table_index][state_index].states.push_back(chosen);
@@ -68,14 +57,11 @@ class OptAlgorithm : public Algorithm {
       possible_states.clear();
       auto min = std::min_element(table[request_length], table[request_length] + possible_state_count, [] (TableEntry const& lhs, TableEntry const& rhs) {return lhs.cost < rhs.cost;});
 
-      if ( debug ) { 
+      if ( debug ) {
         std::cout<< name() << "\n";
-      }
-
-      for ( struct TableEntry e : table[request_length] ) {
-        if ( e.cost == min->cost ) {
-          int i = 0;
-          if ( debug ) {
+        for ( struct TableEntry e : table[request_length] ) {
+          if ( e.cost == min->cost ) {
+            int i = 0;
             Algorithm::print_list_ints(list);
             for ( std::vector<int> state : e.states ) {
               // DEBUG
@@ -83,10 +69,11 @@ class OptAlgorithm : public Algorithm {
               Algorithm::print_list_ints(state);
               i++;
             }
-            if ( debug ) { std::cout << std::endl;}
+            std::cout << std::endl;
           }
         }
       }
+      
       return min->cost;
     };
   protected:

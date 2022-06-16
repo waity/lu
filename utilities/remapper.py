@@ -5,8 +5,8 @@ def main():
   ec = list(input("Ending configuration: "))
   ec = [int(k) for k in ec]
 
-  initial_list = [i for i in range(max(ec))]
-
+  initial_list = [i for i in range(max(ec) + 1)]
+  
   output = []
 
   for k in sequence:
